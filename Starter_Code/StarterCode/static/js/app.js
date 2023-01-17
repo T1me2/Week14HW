@@ -5,13 +5,81 @@ let mydata;
 let names;
 let meta_data;
 let samples;
+let id_tags = []
 
-function init() {
-    data = [{
-      x: [1, 2, 3, 4, 5],
-      y: [1, 2, 4, 8, 16] }];
-  
-    Plotly.newPlot("bar", data);
+//create function that updates plotly, pass it tracker so it updates with the first value in the dropdown b4 something is selected
+function updatePlotly(tracker) {
+    
+    let sample = samples.filter(obj => obj.id == tracker)[0]
+        console.log(sample)
+        
+
+        let bary = sample.otu_ids.slice(0,10).map(id => "OTU ID: " + id)
+        let barx = sample.sample_values.slice(0,10)
+        let bar_label = sample.otu_labels.slice(0,10)
+
+        bardata = [{
+              x: barx,
+              y: bary,
+              ticktext: bar_label,
+              type: "bar",
+              orientation: "h"
+            }];
+
+        let barlayout = {
+        xaxis: {
+            tickmode: "array",
+            tickvals: barx.length,
+            ticktext: barx,
+            
+        }
+        };
+        let bubblex = sample.otu_ids
+        let bubbley = sample.sample_values
+        let bubmarkersize = sample.sample_values
+        let bubblecolor = sample.otu_ids
+        let bubtext = sample.id
+        
+    let bubmetadata = meta_data.filter(obj => obj.id == tracker)[0]
+        console.log(bubmetadata)
+
+        console.log(bubblex)
+        console.log(bubbley)
+        console.log(bubmarkersize)
+        console.log(bubblecolor)
+        console.log(bubtext)
+
+        bubble_data = [{
+            x: bubblex,
+            y: bubbley,
+            mode: 'markers',
+            marker: {
+                size: bubmarkersize
+            }
+            }];
+
+        let  bubble_layout = {
+            title: "OTU ID: " + bubtext,
+            height: 800,
+            width: 1400,
+            showlegend: true
+
+        };
+    
+
+    Plotly.newPlot("bar", bardata, barlayout);
+    Plotly.newPlot("bubble", bubble_data, bubble_layout); 
+    
+    
+            
+        }
+    
+    
+
+function optionChanged(dropdownid) {
+
+    
+    updatePlotly(dropdownid)
 }
 
 //read int the data
@@ -21,73 +89,11 @@ d3.json(sample_data).then(function(data){
     samples = data.samples
     meta_data = data.meta_data
     
-    
     // isert id's into dropdown menu
     names.forEach(name => d3.select("#selDataset").append('option').text(name));
-    
-    // //Initialize the page with a default plot
-    // function init() {
-    //     data = [{
-    //       x: [1, 2, 3, 4, 5],
-    //       y: [1, 2, 4, 8, 16] }];
-      
-    //     Plotly.newPlot("bar", data);
-    // }
-
-    //upon drop down selection, update the bar chart
-    d3.selectAll("#selDataset").on("change", updatePlotly)
-
-    function updatePlotly() {
-    //select the dropdown menu
-        let dropdownMenu = d3.select("#selDataset");
-    //assign the value of the dropdown menu to a variable
-        let dataset = dropdownMenu.property("value");
-    
-    
-        let tracker = dataset
-
-        //loop through until selected id is found, stop index there
-        for (let i = 0; i < samples.length; ++i) {
-            if (samples[i].id === tracker) {break;}
-            x = samples[i].otu_ids;
-            y = samples[i].sample_values;
-            console.log(x)
-        }
         
-        
-        
-    }
+    optionChanged(940); 
 
-    
-
-    
-});
+}); 
 
 
-// d3.selectAll("#selDataset").on("change", updatePlotly);
-
-// function updatePlotly() {
-//     let dropdownMenu = d3.select("#selDataset").property("value", names);
-
-//     // dataset = names
-// }
-
-// updatePlotly();
-
-// d3.select("#selDataset").append('option').text(names);
-
-// console.log(names)
-// d3.selectAll("#selDataset").on("change", updatePlotly);
-// function init()
-
-
-    // build ddl of names
-    // add event to DDL on change (alls modify plot functions)
-    // build initial plot 
-    // put above three into first d3
-
-// });
-
-// build ddl of names
-// add event to DDL on change (alls modify plot functions)
-// build initial plot 
